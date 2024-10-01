@@ -1,4 +1,4 @@
-package main
+package lorm
 
 import (
 	"fmt"
@@ -16,6 +16,6 @@ func (orm *Orm) preparePlan(value interface{}, operation string) {
 func (orm *Orm) saveSql(value interface{}) {
 	columns, values := modelValues(value)
 	orm.Sql = fmt.Sprintf("INSERT INTO \"%v\" (%v) VALUES (%v)", orm.TableName,
-		strings.Join(quoteMap(columns), ","), valuesToBinVar(values))
+		strings.Join(quoteMap(columns), ","), valuesToBindVar(values))
 	orm.SqlVars = values
 }

@@ -1,4 +1,4 @@
-package main
+package lorm
 
 import (
 	"fmt"
@@ -30,7 +30,7 @@ func quoteMap(columns []string) (results []string) {
 	return
 }
 
-func valuesToBinVar(values []interface{}) string {
+func valuesToBindVar(values []interface{}) string {
 	var sqls []string
 	for index, _ := range values {
 		sqls = append(sqls, fmt.Sprintf("$%d", index+1))

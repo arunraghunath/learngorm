@@ -19,9 +19,26 @@ func TestSaveAndFirst(t *testing.T) {
 	newUser := &User{
 		Name: "Arun",
 	}
-	orm := db.Save(newUser)
+	db.Save(newUser)
 
 	queryUser := &User{}
-	orm.First(queryUser)
+	db.First(queryUser)
 	fmt.Println("Printing user details as -->", queryUser.Name)
+
+	queryUsers := []User{}
+	db.First(&queryUsers)
+	for _, v := range queryUsers {
+		fmt.Println("Printing slice of users ", v.Name)
+	}
+}
+
+func TestDeleteAndFirst(t *testing.T) {
+	db := getDB()
+	user := User{}
+	db.Delete(user)
+	fmt.Println("Printing user deleted")
+	getUser := User{}
+	orm := db.First(getUser)
+	fmt.Println(orm.Error)
+
 }

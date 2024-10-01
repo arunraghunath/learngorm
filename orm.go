@@ -1,6 +1,9 @@
 package lorm
 
-import "database/sql"
+import (
+	"database/sql"
+	"fmt"
+)
 
 type Orm struct {
 	TableName   string
@@ -30,10 +33,17 @@ func (orm *Orm) Save(value interface{}) *Orm {
 func (orm *Orm) First(out interface{}) *Orm {
 	orm.preparePlan(out, "query")
 	orm.query(out)
+	fmt.Printf("Just finished First %+v\n", out)
 	return orm
 }
 
 func (orm *Orm) Execute() *Orm {
 	orm.SqlResult, orm.Error = orm.db.Exec(orm.Sql, orm.SqlVars...)
+	return orm
+}
+
+func (orm *Orm) Delete(value interface{}) *Orm {
+	orm.preparePlan(value, "delete")
+	orm.Execute()
 	return orm
 }

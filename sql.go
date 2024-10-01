@@ -13,6 +13,8 @@ func (orm *Orm) preparePlan(value interface{}, operation string) {
 		orm.saveSql(value)
 	case "query":
 		orm.querySql(value)
+	case "delete":
+		orm.deleteSql(value)
 	}
 }
 
@@ -28,25 +30,43 @@ func (orm *Orm) querySql(_ interface{}) *Orm {
 	return orm
 }
 
-func (orm *Orm) query(value interface{}) {
+func (orm *Orm) query(out interface{}) {
+	var (
+		is_slice  bool
+		dest_type reflect.Type
+	)
+	dest_out := reflect.Indirect(reflect.ValueOf(out))
+	if kind := dest_out.Kind(); kind == reflect.Slice {
+		is_slice = true
+		dest_type = dest_out.Type().Elem()
+	}
+
 	rows, err := orm.db.Query(orm.Sql)
 	orm.Error = err
-	fields := reflect.TypeOf(value).Elem()
-	for i := 0; i < fields.NumField(); i++ {
-		fmt.Println("Printing Struct field name ", fields.Field(i).Name)
-	}
 	for rows.Next() {
-		dest := reflect.ValueOf(value).Elem()
-		fmt.Printf("%+v", dest)
+		var dest reflect.Value
+		if is_slice {
+			dest = reflect.New(dest_type).Elem()
+		} else {
+			dest = reflect.ValueOf(out).Elem()
+		}
+
+		fmt.Printf("Printing structure here %+v\n", dest)
 		columns, _ := rows.Columns()
 		var values []interface{}
-		for _, v := range columns {
-			fmt.Println("Column name is ", v)
+		for i, v := range columns {
+			fmt.Println("Printing row ", i)
 			values = append(values, dest.FieldByName(v).Addr().Interface())
-
 		}
-		fmt.Println(values)
 		orm.Error = rows.Scan(values...)
-
 	}
+}
+
+func (orm *Orm) deleteSql(value interface{}) {
+	orm.Sql = fmt.Sprintf("Delete from %v where %v", orm.TableName, orm.whereSql(value))
+}
+
+func (orm *Orm) whereSql(value interface{}) (sql string) {
+	sql = "1=1"
+	return sql
 }

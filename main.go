@@ -32,3 +32,9 @@ func (gdb *DB) First(value interface{}) *Orm {
 	orm = orm.First(value)
 	return orm
 }
+
+func (gdb *DB) Delete(value interface{}) *Orm {
+	orm := gdb.initializeOrm()
+	orm.Delete(value)
+	return orm
+}

@@ -14,13 +14,14 @@ func getDB() DB {
 	return db
 }
 
-func TestSave(t *testing.T) {
+func TestSaveAndFirst(t *testing.T) {
 	db := getDB()
-	user := &User{
+	newUser := &User{
 		Name: "Arun",
 	}
-	orm := db.Save(user)
-	fmt.Println(orm.Sql)
-	fmt.Println(orm.SqlVars...)
+	orm := db.Save(newUser)
 
+	queryUser := &User{}
+	orm.First(queryUser)
+	fmt.Println("Printing user details as -->", queryUser.Name)
 }

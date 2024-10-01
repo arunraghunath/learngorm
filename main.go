@@ -26,3 +26,9 @@ func (gdb *DB) Save(value interface{}) *Orm {
 	orm = orm.Save(value)
 	return orm
 }
+
+func (gdb *DB) First(value interface{}) *Orm {
+	orm := gdb.initializeOrm()
+	orm = orm.First(value)
+	return orm
+}

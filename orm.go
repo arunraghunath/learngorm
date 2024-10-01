@@ -27,6 +27,12 @@ func (orm *Orm) Save(value interface{}) *Orm {
 	return orm
 }
 
+func (orm *Orm) First(out interface{}) *Orm {
+	orm.preparePlan(out, "query")
+	orm.query(out)
+	return orm
+}
+
 func (orm *Orm) Execute() *Orm {
 	orm.SqlResult, orm.Error = orm.db.Exec(orm.Sql, orm.SqlVars...)
 	return orm

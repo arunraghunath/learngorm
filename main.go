@@ -38,3 +38,9 @@ func (gdb *DB) Delete(value interface{}) *Orm {
 	orm.Delete(value)
 	return orm
 }
+
+func (gdb *DB) Where(queryString interface{}, queryArgs ...interface{}) *Orm {
+	orm := gdb.initializeOrm()
+	orm.Where(queryString, queryArgs)
+	return orm
+}

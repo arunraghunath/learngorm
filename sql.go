@@ -3,7 +3,11 @@ package lorm
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 func (orm *Orm) preparePlan(value interface{}, operation string) {
@@ -54,9 +58,10 @@ func (orm *Orm) query(out interface{}) {
 		fmt.Printf("Printing structure here %+v\n", dest)
 		columns, _ := rows.Columns()
 		var values []interface{}
+		caser := cases.Title(language.English)
 		for i, v := range columns {
-			fmt.Println("Printing row ", i)
-			values = append(values, dest.FieldByName(v).Addr().Interface())
+			fmt.Println("Printing row ", i, v, caser.String(v))
+			values = append(values, dest.FieldByName(caser.String(v)).Addr().Interface())
 		}
 		orm.Error = rows.Scan(values...)
 	}
@@ -64,9 +69,21 @@ func (orm *Orm) query(out interface{}) {
 
 func (orm *Orm) deleteSql(value interface{}) {
 	orm.Sql = fmt.Sprintf("Delete from %v where %v", orm.TableName, orm.whereSql(value))
+	fmt.Println("Delete sql is --> ", orm.Sql)
 }
 
 func (orm *Orm) whereSql(value interface{}) (sql string) {
-	sql = "1=1"
-	return sql
+	if len(orm.whereClause) == 0 {
+		return
+	} else {
+		for _, v := range orm.whereClause {
+			sql += sql + v["query"].(string)
+			args := v["args"].([]interface{})
+			for _, arg := range args {
+				orm.SqlVars = append(orm.SqlVars, arg.([]interface{})...)
+				sql = strings.Replace(sql, "?", "$"+strconv.Itoa(len(orm.SqlVars)), 1)
+			}
+		}
+		return
+	}
 }

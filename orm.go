@@ -13,7 +13,7 @@ type Orm struct {
 	Sql         string
 	SqlVars     []interface{}
 	db          *sql.DB
-	whereClause []interface{}
+	whereClause []map[string]interface{}
 	selectStr   string
 	orderStr    string
 	operation   string
@@ -45,5 +45,11 @@ func (orm *Orm) Execute() *Orm {
 func (orm *Orm) Delete(value interface{}) *Orm {
 	orm.preparePlan(value, "delete")
 	orm.Execute()
+	fmt.Println("Delete result is --> ", orm.Error)
+	return orm
+}
+
+func (orm *Orm) Where(queryString interface{}, queryArgs ...interface{}) *Orm {
+	orm.whereClause = append(orm.whereClause, map[string]interface{}{"query": queryString, "args": queryArgs})
 	return orm
 }
